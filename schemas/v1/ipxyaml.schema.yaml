@@ -1,0 +1,385 @@
+$schema: https://yaml-schema.net/yaml-schema.yaml
+$id: urn:rds:ipxyaml:authoring:1
+title: ipxYAML authoring version 1
+description: >-
+  Target authoring contract evolved from mdbook-memmap; existing consumers
+  require migration for hexadecimal string resets and bounded registers. IEEE 1685-2022
+  is the conceptual reference, not a claim of full IP-XACT conformance.
+  Structural validation must be followed by native semantic validation.
+type: object
+additionalProperties: false
+required: [schema_version, naming_profile, kind, vlnv]
+properties:
+  schema_version:
+    description: Authoring contract version; currently the integer 1.
+    type: integer
+    const: 1
+  naming_profile:
+    description: Identifier convention; currently rds-v1.
+    type: string
+    const: rds-v1
+  kind:
+    description: IP defines local maps; system places referenced IPs or systems.
+    type: string
+    enum: [ip, system]
+  vlnv:
+    description: Vendor, library, name, and version identifying this definition.
+    $ref: "#/$defs/vlnv"
+  description:
+    description: Optional authored Markdown prose describing this definition.
+    type: string
+  reset_types:
+    description: IP-local named reset declarations; omit if none are needed.
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/resetType"
+  maps:
+    description: Nonempty list of IP-local maps, each starting at local byte zero.
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/map"
+  address_spaces:
+    description: Nonempty list of system address spaces.
+    type: array
+    minItems: 1
+    items:
+      $ref: "#/$defs/addressSpace"
+allOf:
+  - if:
+      type: object
+      properties:
+        kind:
+          const: ip
+      required: [kind]
+    then:
+      type: object
+      required: [maps]
+      properties:
+        address_spaces:
+          not: {}
+    else:
+      type: object
+      required: [address_spaces]
+      properties:
+        maps:
+          not: {}
+        reset_types:
+          not: {}
+$defs:
+  upperName:
+    description: Uppercase ASCII identifier; no leading/trailing/doubled underscore.
+    type: string
+    pattern: "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"
+  lowerName:
+    description: Lowercase ASCII identifier; no leading/trailing/doubled underscore.
+    type: string
+    pattern: "^[a-z][a-z0-9]*(_[a-z0-9]+)*$"
+  nonemptyString:
+    description: String containing at least one non-whitespace character.
+    type: string
+    minLength: 1
+    pattern: "\\S"
+  nonnegative:
+    description: Nonnegative address or offset integer; address limits are independent of register size.
+    type: integer
+    minimum: 0
+  positive:
+    description: Positive integer byte count; arbitrary precision natively.
+    type: integer
+    minimum: 1
+  bitIndex:
+    description: Zero-based bit index within a register of at most 64 bits.
+    type: integer
+    minimum: 0
+    maximum: 63
+  bitWidth:
+    description: Field width in bits; must fit the containing register.
+    type: integer
+    minimum: 1
+    maximum: 64
+  registerWidth:
+    description: Register storage size selected for the target architecture.
+    type: integer
+    enum: [8, 16, 32, 64]
+  hex64:
+    description: >-
+      Quoted unsigned hexadecimal pattern with lowercase 0x prefix and 1 to 16
+      hexadecimal digits. Its numeric value must fit the containing field width.
+    type: string
+    pattern: "^0x[0-9A-Fa-f]{1,16}$"
+  byteWidth:
+    description: Positive bit count divisible by eight, limited to unsigned 64-bit capacity.
+    type: integer
+    minimum: 8
+    maximum: 18446744073709551615
+    multipleOf: 8
+  access:
+    description: Software-visible access permission, not hardware access.
+    type: string
+    enum: [read-only, write-only, read-write, writeOnce, read-writeOnce, no-access]
+  vlnv:
+    type: object
+    additionalProperties: false
+    required: [vendor, library, name, version]
+    properties:
+      vendor:
+        description: Vendor identity, for example example.org.
+        $ref: "#/$defs/nonemptyString"
+      library:
+        description: Logical library containing this definition.
+        $ref: "#/$defs/nonemptyString"
+      name:
+        description: Definition identity; not subject to map/register naming patterns.
+        $ref: "#/$defs/nonemptyString"
+      version:
+        description: Definition revision as text; quote numeric-looking versions.
+        $ref: "#/$defs/nonemptyString"
+  resetType:
+    type: object
+    additionalProperties: false
+    required: [name]
+    properties:
+      name:
+        description: IP-local reset name referenced by field resets.
+        $ref: "#/$defs/upperName"
+      description:
+        description: Reset trigger, priority, or other behavior in Markdown prose.
+        type: string
+  reset:
+    type: object
+    additionalProperties: false
+    required: [resetType, value, mask]
+    properties:
+      resetType:
+        description: Exact name of an IP-local reset_types declaration.
+        $ref: "#/$defs/upperName"
+      value:
+        description: Field-relative reset value as quoted hexadecimal; must fit the field width.
+        $ref: "#/$defs/hex64"
+      mask:
+        description: Field-relative known-bit mask; one means the reset bit is specified.
+        $ref: "#/$defs/hex64"
+  field:
+    type: object
+    additionalProperties: false
+    required: [name, lsb, width_bits, access, hwAccess, volatile]
+    properties:
+      name:
+        description: Field identifier, unique within the register.
+        $ref: "#/$defs/upperName"
+      description:
+        description: Markdown prose; document update priorities and implementation-specific behavior here.
+        type: string
+      lsb:
+        description: Least significant field bit, relative to the containing register.
+        $ref: "#/$defs/bitIndex"
+      width_bits:
+        description: Positive field width in bits; need not be byte-sized.
+        $ref: "#/$defs/bitWidth"
+      access:
+        description: Software-visible field access permission.
+        $ref: "#/$defs/access"
+      hwAccess:
+        description: Hardware-side permission; hardware writes require volatile true.
+        type: string
+        enum: [read-only, write-only, read-write, no-access]
+      volatile:
+        description: Whether the field may change independently of software writes.
+        type: boolean
+      modified_write_value:
+        description: Software write side effect; omit for ordinary write behavior.
+        type: string
+        enum: [oneToClear, oneToSet, oneToToggle, zeroToClear, zeroToSet, zeroToToggle, clear, set]
+      read_action:
+        description: Software read side effect; omit for no declared read side effect.
+        type: string
+        enum: [clear, set]
+      resets:
+        description: Optional nonempty reset records, at most one per reset type.
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/reset"
+    allOf:
+      - if:
+          type: object
+          properties:
+            hwAccess:
+              enum: [write-only, read-write]
+          required: [hwAccess]
+        then:
+          type: object
+          properties:
+            volatile:
+              const: true
+      - if:
+          type: object
+          required: [modified_write_value]
+        then:
+          type: object
+          properties:
+            access:
+              enum: [write-only, read-write, writeOnce, read-writeOnce]
+      - if:
+          type: object
+          required: [read_action]
+        then:
+          type: object
+          properties:
+            access:
+              enum: [read-only, read-write, read-writeOnce]
+  register:
+    type: object
+    additionalProperties: false
+    required: [name, offset, width_bits, fields]
+    properties:
+      name:
+        description: Register identifier, unique within the local map.
+        $ref: "#/$defs/upperName"
+      description:
+        description: Optional register documentation in Markdown.
+        type: string
+      offset:
+        description: Byte offset from map origin; aligned to this register's width in bytes.
+        $ref: "#/$defs/nonnegative"
+      width_bits:
+        description: Register storage width in bits; exactly 8, 16, 32, or 64.
+        $ref: "#/$defs/registerWidth"
+      fields:
+        description: Nonempty implemented fields; gaps are reserved, not implicit fields.
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/field"
+  map:
+    type: object
+    additionalProperties: false
+    required: [name, size_bytes, data_width_bits]
+    properties:
+      name:
+        description: Local map identifier, unique within the IP and used as mapping target.
+        $ref: "#/$defs/lowerName"
+      description:
+        description: Optional local map documentation in Markdown.
+        type: string
+      usage:
+        description: Map role; omission is interpreted as register by the native loader.
+        type: string
+        enum: [register, memory, reserved]
+        default: register
+      size_bytes:
+        description: Positive local map extent in bytes, independent of placement.
+        $ref: "#/$defs/positive"
+      data_width_bits:
+        description: Map data width in bits; a positive multiple of eight.
+        $ref: "#/$defs/byteWidth"
+      access:
+        description: Required software permission for memory only; forbidden for register/reserved.
+        $ref: "#/$defs/access"
+      registers:
+        description: Required nonempty register list for register usage; otherwise forbidden.
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/register"
+    allOf:
+      - if:
+          type: object
+          properties:
+            usage:
+              const: register
+        then:
+          type: object
+          required: [registers]
+          properties:
+            access:
+              not: {}
+        else:
+          type: object
+          properties:
+            registers:
+              not: {}
+      - if:
+          type: object
+          properties:
+            usage:
+              const: memory
+          required: [usage]
+        then:
+          type: object
+          required: [access]
+      - if:
+          type: object
+          properties:
+            usage:
+              const: reserved
+          required: [usage]
+        then:
+          type: object
+          properties:
+            access:
+              not: {}
+  mapping:
+    type: object
+    additionalProperties: false
+    required: [target, base, size_bytes]
+    properties:
+      target:
+        description: Exact child IP map name or child system address-space name.
+        $ref: "#/$defs/lowerName"
+      base:
+        description: Byte base of the allocated window in the parent address space.
+        $ref: "#/$defs/nonnegative"
+      size_bytes:
+        description: Positive allocation size in bytes; must contain the entire child target.
+        $ref: "#/$defs/positive"
+  instance:
+    type: object
+    additionalProperties: false
+    required: [name, source, mappings]
+    properties:
+      name:
+        description: Instance identifier, unique within the containing address space.
+        $ref: "#/$defs/upperName"
+      description:
+        description: Optional documentation of this particular use of the child.
+        type: string
+      source:
+        description: Child YAML path, relative to this YAML file or absolute.
+        $ref: "#/$defs/nonemptyString"
+      mappings:
+        description: Nonempty placements; each target may occur only once per instance.
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/mapping"
+  addressSpace:
+    type: object
+    additionalProperties: false
+    required: [name, address_width_bits, data_width_bits, size_bytes, instances]
+    properties:
+      name:
+        description: Address-space identifier, unique within the system.
+        $ref: "#/$defs/lowerName"
+      description:
+        description: Optional address-space documentation in Markdown.
+        type: string
+      address_width_bits:
+        description: Positive address width in bits; size_bytes must not exceed 2 to this power.
+        type: integer
+        minimum: 1
+        maximum: 18446744073709551615
+      data_width_bits:
+        description: Address-space data width in bits; a positive multiple of eight.
+        $ref: "#/$defs/byteWidth"
+      size_bytes:
+        description: Positive byte extent of the space, starting at local address zero.
+        $ref: "#/$defs/positive"
+      instances:
+        description: Nonempty list of referenced IP or subsystem instances.
+        type: array
+        minItems: 1
+        items:
+          $ref: "#/$defs/instance"

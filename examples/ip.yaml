@@ -1,0 +1,84 @@
+schema_version: 1
+naming_profile: rds-v1
+kind: ip
+vlnv:
+  vendor: example.org
+  library: peripherals
+  name: event_unit
+  version: "1.0"
+description: An event unit with control, status, scratch memory, and a reserved region.
+reset_types:
+  - name: HARD
+    description: External reset; takes priority over hardware and software updates.
+maps:
+  - name: csr
+    size_bytes: 4096
+    data_width_bits: 32
+    registers:
+      - name: CTRL
+        offset: 0
+        width_bits: 32
+        fields:
+          - name: ENABLE
+            description: Enable event capture.
+            lsb: 0
+            width_bits: 1
+            access: read-write
+            hwAccess: read-only
+            volatile: false
+            resets:
+              - resetType: HARD
+                value: "0x0"
+                mask: "0x1"
+      - name: STATUS
+        offset: 0x4
+        width_bits: 32
+        fields:
+          - name: PENDING
+            description: Hardware sets on an event; hardware set wins over software clear.
+            lsb: 0
+            width_bits: 1
+            access: read-write
+            hwAccess: read-write
+            volatile: true
+            modified_write_value: oneToClear
+            resets:
+              - resetType: HARD
+                value: "0x0"
+                mask: "0x1"
+          - name: SEEN
+            description: Hardware sets on an event; reading clears this indication.
+            lsb: 1
+            width_bits: 1
+            access: read-only
+            hwAccess: write-only
+            volatile: true
+            read_action: clear
+            resets:
+              - resetType: HARD
+                value: "0x0"
+                mask: "0x1"
+      - name: DATA64
+        offset: 0x8
+        width_bits: 64
+        description: Full unsigned 64-bit reset pattern, represented without a YAML integer.
+        fields:
+          - name: DATA
+            lsb: 0
+            width_bits: 64
+            access: read-write
+            hwAccess: read-only
+            volatile: false
+            resets:
+              - resetType: HARD
+                value: "0xFFFFFFFFFFFFFFFF"
+                mask: "0xFFFFFFFFFFFFFFFF"
+  - name: scratch
+    usage: memory
+    size_bytes: 256
+    data_width_bits: 32
+    access: read-write
+  - name: hole
+    usage: reserved
+    size_bytes: 256
+    data_width_bits: 32
