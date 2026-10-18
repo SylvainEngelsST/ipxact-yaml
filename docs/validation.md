@@ -21,7 +21,7 @@ the native consumer's unknown-property rule. An editor's comment directive, such
 as `# yaml-language-server: $schema=../schemas/v1/ipxyaml.schema.yaml`, does not
 add a document property, but editor support for this YAML-native dialect varies.
 
-## Validate the schema itself
+## Optional official meta-schema check
 
 Fetch the site's official meta-schema, then run it locally against our schema:
 
@@ -37,7 +37,8 @@ local. The meta-schema is upstream-owned and may evolve; the validator version
 is pinned for reproducibility. The test command accepts `--ys /path/to/ys` if
 the executable is not on `PATH`.
 
-The tests check meta-schema validity, valid examples, negative mutations across
+The optional `--meta-schema` argument checks meta-schema validity and an unknown
+keyword rejection. Without it, the tests check valid examples and negative mutations across
 all object types and conditional branches, required/unknown properties, names,
 access/effects, and nonempty lists. They require Python 3.6+ and `ys`, with no
 Python packages. They distinguish validation diagnostics from tool/setup failures,

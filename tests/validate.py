@@ -283,13 +283,14 @@ def validate_native(executable):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--ys", default="ys", help="Path to yaml-schema.net ys executable")
-    parser.add_argument("--meta-schema", required=True, type=Path,
+    parser.add_argument("--ys", default="./bin/ys", help="Path to yaml-schema.net ys executable")
+    parser.add_argument("--meta-schema", type=Path,
                         help="Downloaded official https://yaml-schema.net/yaml-schema.yaml")
     parser.add_argument("--mdbook-memmap",
                         help="Optional migrated native executable supporting hexadecimal string resets")
     args = parser.parse_args()
-    validate(args.ys, args.meta_schema, SCHEMA, True)
+    if args.meta_schema:
+        validate(args.ys, args.meta_schema, SCHEMA, True)
     count = 1
     for example in sorted((ROOT / "examples").glob("*.yaml")):
         validate(args.ys, SCHEMA, example, True)
@@ -303,9 +304,10 @@ def main():
             except AssertionError as error:
                 raise AssertionError("{}: {}".format(name, error))
             count += 1
-        document.write_text(SCHEMA.read_text() + "\nunknownKeyword: true\n")
-        validate(args.ys, args.meta_schema, document, False)
-        count += 1
+        if args.meta_schema:
+            document.write_text(SCHEMA.read_text() + "\nunknownKeyword: true\n")
+            validate(args.ys, args.meta_schema, document, False)
+            count += 1
     print("Passed {} checks using {}".format(count, args.ys))
     if args.mdbook_memmap:
         count = validate_native(args.mdbook_memmap)

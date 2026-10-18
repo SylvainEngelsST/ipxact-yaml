@@ -1,14 +1,12 @@
 # rds-ipxYAML
 
 Reference schema and field-by-field documentation for **ipxYAML**, the
-memory-map authoring format derived from `mdbook-memmap`.
+memory-map authoring format derived from **IP-XACT IEEE1685-2022**
 
 The current contract is `schema_version: 1`, `naming_profile: rds-v1`.
 The authoritative schema is
 [`schemas/v1/ipxyaml.schema.yaml`](schemas/v1/ipxyaml.schema.yaml), written
-in [YAML Schema](https://yaml-schema.net/). This is the target contract for a
-future mdbook-memmap update, not its Rust internal model, mdBook configuration,
-or release locks.
+in [YAML Schema](https://yaml-schema.net/). 
 
 **Compatibility notice:** v1 has been revised before release. Register sizes
 are now exactly 8, 16, 32, or 64 bits; reset `value` and `mask` are quoted
@@ -30,23 +28,27 @@ does not accept these reset strings and must be updated separately. See
 
 ## Validate
 
-Install the reference implementation from yaml-schema.net:
+An pre_installed version is available under `./bin` directory. If the version or the operating system need to be changed, you can install the reference implementation from yaml-schema.net:
 
 ```sh
 cargo install yaml-schema --version 0.9.3 --locked
-ys -f schemas/v1/ipxyaml.schema.yaml examples/ip.yaml
+```
+
+Validate the YAML versus the schema :
+
+```sh
+./bin/ys -f schemas/v1/ipxyaml.schema.yaml examples/ip.yaml
 ```
 
 Validate the schema itself against the official meta-schema:
 
 ```sh
 curl -fsSL https://yaml-schema.net/yaml-schema.yaml -o /tmp/yaml-schema.meta.yaml
-ys -f /tmp/yaml-schema.meta.yaml schemas/v1/ipxyaml.schema.yaml
+
+./bin/ys -f /tmp/yaml-schema.meta.yaml schemas/v1/ipxyaml.schema.yaml
+
 python3 tests/validate.py --meta-schema /tmp/yaml-schema.meta.yaml
 ```
-
-In proxy-controlled environments, load the local proxy configuration before
-network commands. No authored documents need to be sent to a website.
 
 Structural validation is necessary but **not sufficient**: an updated consumer
 must enforce lexical restrictions, overlap/bounds checks, field-relative reset

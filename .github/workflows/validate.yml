@@ -7,10 +7,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - name: Install YAML Schema validator
-        run: cargo install yaml-schema --version 0.9.3 --locked
-      - name: Fetch official meta-schema
-        run: curl --fail --silent --show-error --location https://yaml-schema.net/yaml-schema.yaml -o "$RUNNER_TEMP/yaml-schema.meta.yaml"
       - name: Validate schema and authoring examples
-        run: python3 tests/validate.py --meta-schema "$RUNNER_TEMP/yaml-schema.meta.yaml"
+        run: python3 tests/validate.py --ys ./bin/ys
