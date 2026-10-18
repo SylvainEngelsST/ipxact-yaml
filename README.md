@@ -1,9 +1,9 @@
 # rds-ipxYAML
 
 Reference schema and field-by-field documentation for **ipxYAML**, the
-memory-map authoring format derived from **IP-XACT IEEE1685-2022**
+memory-map authoring format derived from **IP-XACT IEEE1685-2022** and can be found under [edaa-org](https://github.com/edaa-org/IPXACT-Schema/tree/main/ieee-1685-2022) git directory
 
-The current contract is `schema_version: 1`, `naming_profile: rds-v1`.
+The current contract is `schema_version: 1`, `naming_profile: yaml-ipxact2022`.
 The authoritative schema is
 [`schemas/v1/ipxyaml.schema.yaml`](schemas/v1/ipxyaml.schema.yaml), written
 in [YAML Schema](https://yaml-schema.net/). 

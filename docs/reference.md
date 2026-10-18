@@ -38,7 +38,7 @@ volatility values. The only authored property default is map `usage: register`.
 | Property | Requirement / type | Usage |
 |---|---|---|
 | `schema_version` | Required integer `1` | Authoring format version, independent of VLNV and tool versions. |
-| `naming_profile` | Required string `rds-v1` | Selects the identifier conventions above. |
+| `naming_profile` | Required string `yaml-ipxact2022` | Selects the identifier conventions above. |
 | `kind` | Required `ip` or `system` | Determines which root collections are legal. |
 | `vlnv` | Required object | Identity of this definition; see below. |
 | `description` | Optional string | Documentation for the definition. |

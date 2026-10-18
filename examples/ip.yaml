@@ -1,5 +1,5 @@
 schema_version: 1
-naming_profile: rds-v1
+naming_profile: yaml-ipxact2022
 kind: ip
 vlnv:
   vendor: example.org

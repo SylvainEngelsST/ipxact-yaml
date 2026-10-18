@@ -15,9 +15,9 @@ properties:
     type: integer
     const: 1
   naming_profile:
-    description: Identifier convention; currently rds-v1.
+    description: Identifier convention; currently yaml-ipxact2022.
     type: string
-    const: rds-v1
+    const: yaml-ipxact2022
   kind:
     description: IP defines local maps; system places referenced IPs or systems.
     type: string

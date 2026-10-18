@@ -21,7 +21,7 @@ MAP = {
     "registers": [REGISTER],
 }
 IP = {
-    "schema_version": 1, "naming_profile": "rds-v1", "kind": "ip",
+    "schema_version": 1, "naming_profile": "yaml-ipxact2022", "kind": "ip",
     "vlnv": {"vendor": "example.org", "library": "test", "name": "unit", "version": "1"},
     "reset_types": [{"name": "HARD"}], "maps": [MAP],
 }
@@ -32,7 +32,7 @@ SPACE = {
     "size_bytes": 65536, "instances": [INSTANCE],
 }
 SYSTEM = {
-    "schema_version": 1, "naming_profile": "rds-v1", "kind": "system",
+    "schema_version": 1, "naming_profile": "yaml-ipxact2022", "kind": "system",
     "vlnv": {"vendor": "example.org", "library": "test", "name": "system", "version": "1"},
     "address_spaces": [SPACE],
 }
