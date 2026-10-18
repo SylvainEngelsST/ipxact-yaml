@@ -25,7 +25,6 @@ maps:
             width_bits: 1
             access: read-write
             hwAccess: read-only
-            volatile: false
             resets:
               - resetType: HARD
                 value: "0x0"
@@ -40,7 +39,6 @@ maps:
             width_bits: 1
             access: read-write
             hwAccess: read-write
-            volatile: true
             modified_write_value: oneToClear
             resets:
               - resetType: HARD
@@ -52,7 +50,6 @@ maps:
             width_bits: 1
             access: read-only
             hwAccess: write-only
-            volatile: true
             read_action: clear
             resets:
               - resetType: HARD
@@ -68,7 +65,6 @@ maps:
             width_bits: 64
             access: read-write
             hwAccess: read-only
-            volatile: false
             resets:
               - resetType: HARD
                 value: "0xFFFFFFFFFFFFFFFF"

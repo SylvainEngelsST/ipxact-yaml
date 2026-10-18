@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "schemas/v1/ipxyaml.schema.yaml"
 FIELD = {
     "name": "FLAG", "lsb": 0, "width_bits": 1,
-    "access": "read-write", "hwAccess": "read-only", "volatile": False,
+    "access": "read-write", "hwAccess": "read-only",
 }
 REGISTER = {"name": "CTRL", "offset": 0, "width_bits": 32, "fields": [FIELD]}
 MAP = {
@@ -109,10 +109,9 @@ def cases():
         (field_path, "width_bits", 3, True),
         (field_path, "lsb", -1, False),
         (field_path, "hwAccess", "writeOnce", False),
-        (field_path, "hwAccess", "write-only", False),
-        (field_path, "hwAccess", "read-write", False),
-        (field_path, "volatile", "true", False),
-        (field_path, "volatile", True, True),
+        (field_path, "hwAccess", "write-only", True),
+        (field_path, "hwAccess", "read-write", True),
+        (field_path, "volatile", True, False),
         (field_path, "access", "rw", False),
         (field_path, "modified_write_value", "invalid", False),
         (field_path, "read_action", "modify", False),
@@ -179,11 +178,9 @@ def cases():
             yield "read-{}-{}".format(access, effect), value, access in [
                 "read-only", "read-write", "read-writeOnce"]
     for access in ["read-only", "write-only", "read-write", "no-access"]:
-        for volatile in [False, True]:
-            value = copy.deepcopy(IP)
-            at(value, field_path).update(hwAccess=access, volatile=volatile)
-            yield "hardware-{}-{}".format(access, volatile), value, (
-                volatile or access in ["read-only", "no-access"])
+        value = copy.deepcopy(IP)
+        at(value, field_path)["hwAccess"] = access
+        yield "hardware-{}".format(access), value, True
     for width in [8, 16, 32, 64, 0, 7, 24, 48, 128]:
         value = copy.deepcopy(IP)
         value["maps"][0]["registers"][0]["width_bits"] = width

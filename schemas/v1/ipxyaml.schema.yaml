@@ -164,7 +164,7 @@ $defs:
   field:
     type: object
     additionalProperties: false
-    required: [name, lsb, width_bits, access, hwAccess, volatile]
+    required: [name, lsb, width_bits, access, hwAccess]
     properties:
       name:
         description: Field identifier, unique within the register.
@@ -182,12 +182,9 @@ $defs:
         description: Software-visible field access permission.
         $ref: "#/$defs/access"
       hwAccess:
-        description: Hardware-side permission; hardware writes require volatile true.
+        description: Hardware-side permission, independently specified.
         type: string
         enum: [read-only, write-only, read-write, no-access]
-      volatile:
-        description: Whether the field may change independently of software writes.
-        type: boolean
       modified_write_value:
         description: Software write side effect; omit for ordinary write behavior.
         type: string
@@ -203,17 +200,6 @@ $defs:
         items:
           $ref: "#/$defs/reset"
     allOf:
-      - if:
-          type: object
-          properties:
-            hwAccess:
-              enum: [write-only, read-write]
-          required: [hwAccess]
-        then:
-          type: object
-          properties:
-            volatile:
-              const: true
       - if:
           type: object
           required: [modified_write_value]

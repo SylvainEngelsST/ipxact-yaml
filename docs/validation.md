@@ -53,7 +53,7 @@ and is not compatible with the revised v1.
 | Layer | Checks |
 |---|---|
 | Official meta-schema via `ys` | Schema vocabulary and shape, including unknown schema keywords. |
-| Reference schema via `ys` | Required/unknown properties, scalar types, enums, naming patterns, positive/nonnegative values, register sizes 8/16/32/64, field width/index limits, hexadecimal reset syntax and 64-bit ceiling, nonempty lists, kind/usage branches, hardware-write volatility, effect/access compatibility. |
+| Reference schema via `ys` | Required/unknown properties, scalar types, enums, naming patterns, positive/nonnegative values, register sizes 8/16/32/64, field width/index limits, hexadecimal reset syntax and 64-bit ceiling, nonempty lists, kind/usage branches, hardware-access enums, effect/access compatibility. |
 | Native YAML parser | Exactly one document, string keys, duplicate/merge key rejection, no anchors/aliases/explicit tags, supported directives, strict scalar spelling, nesting capacity. |
 | Native local validator | Unique names, register alignment/bounds/overlaps, field bounds/overlaps, reset references/duplicates/widths, address capacity, allocation bounds/overlaps, duplicate mapping targets. |
 | Native project loader/resolver | Readable referenced sources, unique VLNV per canonical file, no cycles, depth limit, existing child targets, allocation large enough for target, final register alignment, unambiguous flattened names. |

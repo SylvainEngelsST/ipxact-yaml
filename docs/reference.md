@@ -3,7 +3,6 @@
 The [schema](../schemas/v1/ipxyaml.schema.yaml) defines structural constraints.
 This reference also describes the native semantic requirements.
 See [validation](validation.md) before treating a document as valid.
-This revised v1 is a target contract; existing mdbook-memmap must be migrated.
 
 ## Common conventions
 
@@ -16,7 +15,7 @@ This revised v1 is a target contract; existing mdbook-memmap must be migrated.
   multiline text (`|`). It may be empty. Descriptions do not configure behavior.
 - Byte addresses are zero-based. Ranges are half-open: `[base, base + size)`.
   Widths and bit positions are in bits; offsets, bases, and extents are in bytes.
-- `rds-v1` uppercase names start with `A`-`Z`, then contain uppercase ASCII
+- Uppercase names start with `A`-`Z`, then contain uppercase ASCII
   letters, digits, or single internal underscores. Lowercase names follow the
   equivalent `a`-`z` convention. Leading/trailing/doubled underscores are invalid.
   Examples: `EVENT0`, `SOFT_RESET`, `csr`, `cpu_0`.
@@ -107,7 +106,7 @@ width converter.
 The register must fit the map and its offset must align to its own byte size.
 Registers must not overlap. Other sizes, including 24, 48, and 128 bits, are invalid.
 For example, a 32-bit register at offset 4 occupies bytes `[4, 8)`.
-Registers have no authored `access`, `hwAccess`, `volatile`, or reset property:
+Registers have no authored `access`, `hwAccess`, or reset property:
 those belong to fields.
 
 ## Field (`registers[].fields[]`)
@@ -120,7 +119,6 @@ those belong to fields.
 | `width_bits` | Required integer, 1 to 64 | Number of bits; must fit the register, but need not be byte-aligned. |
 | `access` | Required access enum | Software-side access. |
 | `hwAccess` | Required hardware access enum | Hardware-side access, independently specified. |
-| `volatile` | Required boolean | Whether the field may change independently of software writes. |
 | `modified_write_value` | Optional write-effect enum | Software write behavior; omit for ordinary writes. |
 | `read_action` | Optional `clear` or `set` | Software read side effect; omit for no declared effect. |
 | `resets` | Optional nonempty list | Field-relative reset records; see below. |
@@ -146,7 +144,7 @@ Write-once permissions are descriptive. The schema does not implement a latch,
 select a reset that rearms writes, or define illegal-access bus responses.
 Explain implementation-specific behavior in descriptions.
 
-### Hardware access (`hwAccess`) and volatility
+### Hardware access (`hwAccess`)
 
 | Value | Meaning |
 |---|---|
@@ -158,13 +156,10 @@ Explain implementation-specific behavior in descriptions.
 Permissions are from the named actor's perspective. A software-writable control
 field consumed by logic may use `access: read-write`, `hwAccess: read-only`.
 A hardware-updated status flag may use `access: read-only`,
-`hwAccess: write-only`, `volatile: true`.
-
-Hardware-write permission (`write-only` or `read-write`) requires
-`volatile: true`. The converse is not enforced: `volatile: true` does not
-automatically grant hardware writes. Hardware access has no write-once values.
-No permission combination supplies arbitration, clock-domain behavior, or
-reset/update priorities; document those separately.
+`hwAccess: write-only`. The translator derives IP-XACT volatility from
+hardware-access analysis; volatility is not authored in ipxYAML. Hardware access
+has no write-once values. No permission combination supplies arbitration,
+clock-domain behavior, or reset/update priorities; document those separately.
 
 ### Software write effects (`modified_write_value`)
 

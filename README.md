@@ -21,8 +21,6 @@ does not accept these reset strings and must be updated separately. See
 - [IEEE 1685-2022 relationship](docs/ieee-1685-2022.md): scope, conceptual
   mapping, and project-specific conventions.
 - [Validation](docs/validation.md): `ys` commands, validation boundaries, and tests.
-- [Provenance and versioning](docs/provenance.md): rds-designspec origins and
-  the mdbook-memmap implementation used to construct this schema.
 - Examples: [IP](examples/ip.yaml), [subsystem](examples/subsystem.yaml),
   and [system](examples/system.yaml).
 
