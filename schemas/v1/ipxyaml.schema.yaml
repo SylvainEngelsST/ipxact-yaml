@@ -1,5 +1,5 @@
 $schema: https://yaml-schema.net/yaml-schema.yaml
-$id: urn:rds:ipxyaml:authoring:1
+$id: urn:ipxyaml:authoring:1
 title: ipxYAML authoring version 1
 description: >-
   Target authoring contract evolved from mdbook-memmap; existing consumers

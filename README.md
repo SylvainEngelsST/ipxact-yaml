@@ -1,4 +1,4 @@
-# rds-ipxYAML
+# ipxYAML
 
 Reference schema and field-by-field documentation for **ipxYAML**, the
 memory-map authoring format derived from **IP-XACT IEEE1685-2022** and can be found under [edaa-org](https://github.com/edaa-org/IPXACT-Schema/tree/main/ieee-1685-2022) git directory

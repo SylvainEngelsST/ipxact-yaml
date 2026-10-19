@@ -119,7 +119,7 @@ For example, a book chapter may include:
 
 ````markdown
 ```memmap
-source: /absolute/path/to/rds-ipxYAML/examples/system.yaml
+source: /absolute/path/to/ipxYAML/examples/system.yaml
 address_space: cpu
 view: summary
 ```
